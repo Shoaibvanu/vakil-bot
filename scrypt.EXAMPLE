@@ -1,0 +1,52 @@
+import streamlit as st
+from dotenv import load_dotenv
+import openai
+from htmlTemplates import css, bot_template, user_template
+
+openai.api_key = "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"
+
+def is_legal_response(response):
+    legal_keywords = ["indian law", "legal", "law", "sections", "sub-sections"]
+    return any(keyword in response.lower() for keyword in legal_keywords)
+
+def get_openai_response(question, model="gpt-3.5-turbo-0613"):
+    messages = [
+        {"role": "system", "content": "You are a helpful legal assistant specialized in Indian law."},
+        {"role": "user", "content": f"Legal question: {question}"}
+    ]
+
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        max_tokens=700
+    )
+    
+    if is_legal_response(response['choices'][0]['message']['content']):
+        return response['choices'][0]['message']['content'].strip()
+    else:
+        return "I don't know the answer to that question about Indian law."
+
+def handle_userinput(user_question):
+    response = get_openai_response(user_question)
+    st.write(bot_template.replace("{{MSG}}", response), unsafe_allow_html=True)
+
+def main():
+    load_dotenv()
+    
+    st.set_page_config(page_title="Legal Chatbot", page_icon="icon.png")
+    
+    st.write(css, unsafe_allow_html=True)
+    
+    st.header("HOW MAY I ASSIST YOU")
+    
+    user_question = st.text_input("ASK A LEGAL QUESTION RELATED TO INDIAN LAW")
+    
+    if user_question:
+        handle_userinput(user_question)
+
+if __name__ == '__main__':
+    main()
+
+
+
+
