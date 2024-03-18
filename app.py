@@ -47,7 +47,7 @@ def get_text_chunks(text):
     return chunks
 
 def get_vectorstore(text_chunks):
-    embeddings = HuggingFaceEmbeddings(model_name="nlpaueb/legal-bert-base-uncased")
+    embeddings = HuggingFaceInstructEmbeddings(model_name="nlpaueb/legal-bert-base-uncased")
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
 
